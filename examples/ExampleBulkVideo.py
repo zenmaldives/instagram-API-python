@@ -15,14 +15,9 @@ import urllib
 PhotoPath = "~/igvid"  # Change Directory to Folder with Pics that you want to upload
 # Change to your Photo Hashtag
 IGCaption = "Your Caption + #Hashtag"
-
-thumb_uri = 'https://instagram.fcgk6-1.fna.fbcdn.net/vp/d9a7b1df0e691f3663644aaed820b1e3/5A63F236/t51.2885-15/e35/26157933_212816202622096_909866749820665856_n.jpg'
-thumbnail = thumb_uri.split("/")[-1]
+thumbnail = 'x.jpg'
 thumbnail = os.path.dirname(os.path.abspath(__file__)) + '/' + thumbnail
-print(thumbnail)
-#
-#urllib.urlretrieve(video_url, video_local_path)
-#urllib.urlretrieve(thumb_uri, thumbnail)
+
 
 x = os.chdir(PhotoPath)
 ListFiles = [f for f in listdir(PhotoPath) if isfile(join(PhotoPath, f))]
