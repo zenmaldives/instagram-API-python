@@ -12,7 +12,7 @@ from random import randint
 from InstagramAPI import InstagramAPI
 import urllib
 
-PhotoPath = "/home/psi/python/ig/feybeclaudia_/"  # Change Directory to Folder with Pics that you want to upload
+PhotoPath = "~/igvid"  # Change Directory to Folder with Pics that you want to upload
 # Change to your Photo Hashtag
 IGCaption = "Your Caption + #Hashtag"
 
