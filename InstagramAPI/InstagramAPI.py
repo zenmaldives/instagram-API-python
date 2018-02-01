@@ -723,6 +723,20 @@ class InstagramAPI:
                            'media_id': mediaId})
         return self.SendRequest('media/' + str(mediaId) + '/unlike/', self.generateSignature(data))
 
+    def save(self, mediaId):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           '_csrftoken': self.token,
+                           'media_id': mediaId})
+        return self.SendRequest('media/' + str(mediaId) + '/save/', self.generateSignature(data))
+
+    def unsave(self, mediaId):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           '_csrftoken': self.token,
+                           'media_id': mediaId})
+        return self.SendRequest('media/' + str(mediaId) + '/unsave/', self.generateSignature(data))
+
     def getMediaComments(self, mediaId, max_id=''):
         return self.SendRequest('media/' + mediaId + '/comments/?max_id=' + max_id)
 
