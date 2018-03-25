@@ -85,7 +85,7 @@ class InstagramAPI:
 
         if proxy is not None:
             print('Set proxy!')
-            proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
+            proxies = {'http': proxy, 'https': proxy}
             self.s.proxies.update(proxies)
 
     def login(self, force=False):
@@ -388,7 +388,63 @@ class InstagramAPI:
             except:
                 pass
             return False
-
+    
+    def direct_message(self, text, recipients):
+        if type(recipients) != type([]):
+            recipients = [str(recipients)]
+        recipient_users = '"",""'.join(str(r) for r in recipients)
+        endpoint = 'direct_v2/threads/broadcast/text/'
+        boundary = self.uuid
+        bodies   = [
+            {
+                'type' : 'form-data',
+                'name' : 'recipient_users',
+                'data' : '[["{}"]]'.format(recipient_users),
+            },
+            {
+                'type' : 'form-data',
+                'name' : 'client_context',
+                'data' : self.uuid,
+            },
+            {
+                'type' : 'form-data',
+                'name' : 'thread',
+                'data' : '["0"]',
+            },
+            {
+                'type' : 'form-data',
+                'name' : 'text',
+                'data' : text or '',
+            },
+        ]
+        data = self.buildBody(bodies,boundary)
+        self.s.headers.update (
+            {
+                'User-Agent' : self.USER_AGENT,
+                'Proxy-Connection' : 'keep-alive',
+                'Connection': 'keep-alive',
+                'Accept': '*/*',
+                'Content-Type': 'multipart/form-data; boundary={}'.format(boundary),
+                'Accept-Language': 'en-en',
+            }
+        )
+        #self.SendRequest(endpoint,post=data) #overwrites 'Content-type' header and boundary is missed
+        response = self.s.post(self.API_URL + endpoint, data=data)
+        
+        if response.status_code == 200:
+            self.LastResponse = response
+            self.LastJson = json.loads(response.text)
+            return True
+        else:
+            print ("Request return " + str(response.status_code) + " error!")
+            # for debugging
+            try:
+                self.LastResponse = response
+                self.LastJson = json.loads(response.text)
+            except:
+                pass
+            return False
+        
     def direct_share(self, media_id, recipients, text=None):
         if not isinstance(position, list):
             recipients = [str(recipients)]
@@ -727,6 +783,20 @@ class InstagramAPI:
                            'media_id': mediaId})
         return self.SendRequest('media/' + str(mediaId) + '/unlike/', self.generateSignature(data))
 
+    def save(self, mediaId):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           '_csrftoken': self.token,
+                           'media_id': mediaId})
+        return self.SendRequest('media/' + str(mediaId) + '/save/', self.generateSignature(data))
+
+    def unsave(self, mediaId):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           '_csrftoken': self.token,
+                           'media_id': mediaId})
+        return self.SendRequest('media/' + str(mediaId) + '/unsave/', self.generateSignature(data))
+
     def getMediaComments(self, mediaId, max_id=''):
         return self.SendRequest('media/' + mediaId + '/comments/?max_id=' + max_id)
 
@@ -826,6 +896,37 @@ class InstagramAPI:
 
     def generateUploadId(self):
         return str(calendar.timegm(datetime.utcnow().utctimetuple()))
+
+    def createBroadcast(self, previewWidth=1080, previewHeight=1920, broadcastMessage=''):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           'preview_height': previewHeight,
+                           'preview_width': previewWidth,
+                           'broadcast_message': broadcastMessage,
+                           'broadcast_type': 'RTMP',
+                           'internal_only': 0,
+                           '_csrftoken': self.token})
+        return self.SendRequest('live/create/', self.generateSignature(data))
+
+    def startBroadcast(self, broadcastId, sendNotification=False):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           'should_send_notifications': int(sendNotification),
+                           '_csrftoken': self.token})
+        return self.SendRequest('live/' + str(broadcastId) + '/start', self.generateSignature(data))
+
+    def stopBroadcast(self, broadcastId):
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           '_csrftoken': self.token})
+        return self.SendRequest('live/' + str(broadcastId) + '/end_broadcast/', self.generateSignature(data))
+
+    def addBroadcastToLive(self, broadcastId):
+        # broadcast has to be ended first!
+        data = json.dumps({'_uuid': self.uuid,
+                           '_uid': self.username_id,
+                           '_csrftoken': self.token})
+        return self.SendRequest('live/' + str(broadcastId) + '/add_to_post_live/', self.generateSignature(data))
 
     def buildBody(self, bodies, boundary):
         body = u''
