@@ -24,10 +24,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 try:
     from moviepy.editor import VideoFileClip
 except ImportError:
-    import imageio
-    imageio.plugins.ffmpeg.download()
-    from moviepy.editor import VideoFileClip
-    #print("Fail to import moviepy. Need only for Video upload.")
+    print("Fail to import moviepy. Need only for Video upload.")
     
 
 # The urllib library was split into other modules from Python 2 to Python 3
