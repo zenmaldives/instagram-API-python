@@ -9,11 +9,13 @@
 
 from InstagramAPI import InstagramAPI 
 
-username = '' #change this 
-password = '' #change this 
+# change this username & password
+username = 'your_username_here'
+password = 'your_password_here'
 
 ig = InstagramAPI(username, password) 
 
+# login 
 ig.login() 
 
 # get Self user feed 
@@ -28,7 +30,7 @@ Media = MediaList['items'][0]
 
 # get media ID 
 
-MediaID = Media['pk']
+MediaID = Media['id']
 MediaType = Media['media_type']
 
 # call deleteMedia Method
