@@ -36,6 +36,8 @@ except:
     # Issue 159, python3 import fix
     from .ImageUtils import getImageSize
 
+from .exceptions import SentryBlockException
+
 
 class InstagramAPI:
     API_URL = 'https://i.instagram.com/api/v1/'
@@ -978,6 +980,10 @@ class InstagramAPI:
                 self.LastResponse = response
                 self.LastJson = json.loads(response.text)
                 print(self.LastJson)
+                if 'error_type' in self.LastJson and self.LastJson['error_type'] == 'sentry_block':
+                    raise SentryBlockException(self.LastJson['message'])
+            except SentryBlockException:
+                raise
             except:
                 pass
             return False
