@@ -5,7 +5,7 @@
 
 from InstagramAPI import InstagramAPI
 
-api = InstagramAPI("login", "password")
+api = InstagramAPI("maldives.bot", "instagrambot####")
 if (api.login()):
     api.getSelfUserFeed()  # get self user feed
     print(api.LastJson)  # print last response JSON
